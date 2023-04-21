@@ -1,0 +1,20 @@
+This repository has two versions of the rest-word-svr program, and two versions of a Dockerfile.
+
+rest-word-svr-v1.py is the same version of the program we used for Topic-1: REST APIs.   We just take that program and instead of 
+running it as a standalone program, we run it in a Docker container.   We create the image (and then the container) using the Dockerfile
+in this directory.
+
+rest-work-svr-v2.py is a slightly modified version of this program.   It removes the command to use Flask from the main program.   Instead,
+it can be run from the command line To run this program from a terminal window issue the cmds:
+     export FLASK_APP="rest-word-svr-v2.py"
+     flask run --port 8000    
+The first command sets an environment variable which tells Flask which program to run (the exact syntax for setting environment variables may differ 
+depending on what shell you are using).   The second command invokes python and then Flask and tells it to run the program having it listen on port
+8000.  This is a better way to run the program because it removes IP and port addresses from the program code, and allows one to change where the program 
+is run without modifying code.   I.e., insteasd of port 8000 you can run it to listen on a different port by just changing an environment
+variable or by using different flags in the command line.   
+
+We also give an example Dockerfile for running rest-word-svr-v2.py.   We call it Dockerfile.setport.  The difference between this and the previous 
+Dockerfile is that Dockerfile.setport sets the Flask environment variables (to point at the correct application and to run on port 8000), and also sets the
+command "flask run --port 8000" to be run when the container starts up.   
+Note that the environment variables set in Dockerfile.setport can be overridden on the command line.  
