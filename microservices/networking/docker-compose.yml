@@ -1,0 +1,48 @@
+version: '3'  # version of compose format
+
+services:
+  nginx1:
+    image: nginx
+    networks:
+      - mybridge1
+    environment:
+      MYBRIDGE: "one"
+    volumes:
+      - type: bind
+        source: ./nginx1 #host directory
+        target: /usr/share/nginx/html # container directory
+    ports:
+      - "5001:80"  # host:container
+
+  nginx2:
+    image: nginx
+    networks:
+      - mybridge1
+      - mybridge2
+    environment:
+      MYBRIDGE: "one and two"
+    volumes:
+      - type: bind
+        source: ./nginx2 #host directory
+        target: /usr/share/nginx/html # container directory
+    ports:
+      - "5002:80"  # host:container
+
+  nginx3:
+    image: nginx
+    networks:
+      - mybridge2
+    environment:
+      MYBRIDGE: "two"
+    volumes:
+      - type: bind
+        source: ./nginx3 #host directory
+        target: /usr/share/nginx/html # container directory
+    ports:
+      - "5003:80"  # host:container
+
+networks:
+  mybridge1:
+    driver: bridge
+  mybridge2:
+    driver: bridge
