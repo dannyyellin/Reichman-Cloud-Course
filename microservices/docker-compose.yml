@@ -1,0 +1,25 @@
+version: '3'  # version of compose format
+
+services:
+  word-service:
+    build: ./app  # path is relative to docker-compose-shorthand.yml location
+    volumes:
+      - type: bind
+        source: ./app #host directory
+        target: /app # container directory
+    environment:
+      # tells flask run to run in development mode and reload the code on change. This mode should only be used in development.
+      FLASK_DEBUG: "true"
+    ports:
+      - "5001:80"  # host:container
+
+  website:
+    image: php:apache  # pulling image from DockerHub
+    volumes:
+      - type: bind
+        source: ./web # host directory (contains index.php file)
+        target: /var/www/html # container directory (where apache php looks for index file)
+    ports:
+      - "5002:80"  # host:container
+    depends_on:
+      - word-service    # website is not going to work unless word-service is running. orders when services are started
