@@ -1,1 +1,5 @@
 This directory contains code for topic 5: high availability
+There are 3 different docker compose files:
+docker-compose-persist.yml:  this docker-compose yaml makes the app persistent but does not use NGINX as a reverse proxy
+docker-compose-mongo-persist.yml:   this docker-compose yaml is the same as the above, but shows how to make Mongo itself persistent, always using the same volumes.
+docker-compose-reverse.yml: this docker-compose yaml adds to docker-compose-persist.yml so that NGINX is used as a reverse proxy 
