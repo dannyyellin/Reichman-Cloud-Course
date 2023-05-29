@@ -10,7 +10,6 @@ ENV FLASK_APP=rest-word-svr-v3.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=80
 
-# ENV PATH="/usr/bin/mongodb/bin:${PATH}"
 COPY rest-word-svr-v3.py .
 EXPOSE 80
 
