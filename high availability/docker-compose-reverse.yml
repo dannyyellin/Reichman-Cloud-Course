@@ -1,0 +1,36 @@
+version: '3'  # version of compose format
+
+services:
+  word-service:
+    build: ./app  # path is relative to docker-compose-shorthand.yml location
+    restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
+    volumes:
+      - type: bind
+        source: ./app #host directory
+        target: /app # container directory
+    environment:
+      # tells flask run to run in development mode and reload the code on change. This mode should only be used in
+      # development.
+      FLASK_DEBUG: "true"
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "5001:80"  # host:container
+    depends_on:
+      - mongo
+
+  reverse:
+    build: ./reverse
+    ports:
+      - "80:80"  # host:container
+    depends_on: # website is not going to work unless these services are running.
+      - word-service
+
+  mongo:
+    image: mongo
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+#

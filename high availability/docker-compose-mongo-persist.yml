@@ -1,0 +1,26 @@
+version: '3'  # version of compose format
+
+services:
+  word-service:
+    build: ./app  # path is relative to docker-compose-shorthand.yml location
+    restart: always   # possible values for restart are:  "no", always, on-failure, unless-stopped
+    volumes:
+      - type: bind
+        source: ./app #host directory
+        target: /app # container directory
+    environment:
+      FLASK_DEBUG: "true"
+    ports:
+      - "5001:80"  # host:container
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
