@@ -1,0 +1,12 @@
+This repository demonstrates CI/CD workflows using GitHub Actions
+(A) the first workflow is named "build-and-push-v2.yml".  It builds a simple word rest service running in a container and pushes the image to DockerHub.   It pushes the image with the tag "latest" 
+and with the tag <DATE>, where <DATE> is the current date.
+(B) the second workflow is named "pull-and-test-image-v2.yml" pulls the latest image from DockerHub and runs tests against it.   The tests are a few simple curl commands.   We record 
+the commands and the results of the commands so they are visible in the workflow log.
+(C) the third workflow is "build-test-push-v4.yml".  it is a more realistic scenario.  it has two jobs.  the first job builds the image and then, if successful, uploads it to GitHub.  the second
+job downloads the image from GitHub and runs it in a container.   It then runs a suite of tests on it, using a standard testing tool.   It uploads the test results to GitHub.   If all the 
+tests are successful, it pushes the image to DockerHub.   Once the workflow completes, the test results are available to download from GitHub.   
+
+NOTE that in order to load the image to DockerHub, you need to define (in your own repo where you copy this repo to) the following GITHUB secrets: DOCKER_COURSE_USERNAME and 
+DOCKER_COURSE_PASSWORD.  If there are any hardcoded usernames in the code for the DockerHub username (e.g., in pull-and-test-image-v2.yml), replace them with your own
+DockerHub username.   
