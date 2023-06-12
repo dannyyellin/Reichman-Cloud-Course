@@ -1,0 +1,33 @@
+name: pull-and-test-image-v2
+on:
+  workflow_run:
+    workflows: ["build-and-push-v2"]
+    types:
+      - completed
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    services:
+      wordcontainer:
+        image: dannyteaching/wordsvr-v2:latest
+        ports:
+           - 8000:8000
+    steps:
+    - name: check if app is running
+      run: docker ps
+    - name: create directory
+      run: mkdir -p mypath
+    - name: curl
+      run: |
+        echo curl --location --request POST 'http://127.0.0.1:8000/words?word=wood' >> mypath/results
+        echo $(curl --location --request POST 'http://127.0.0.1:8000/words?word=wood') >> mypath/results
+        echo curl --location --request POST 'http://127.0.0.1:8000/words?word=silver' >> mypath/results
+        echo $(curl --location --request POST 'http://127.0.0.1:8000/words?word=silver') >> mypath/results
+        echo curl --location --request POST 'http://127.0.0.1:8000/words?word=throw' >> mypath/results
+        echo $(curl --location --request POST 'http://127.0.0.1:8000/words?word=throw') >> mypath/results
+        echo curl --location --request POST 'http://127.0.0.1:8000/words?word=coffee' >> mypath/results
+        echo $(curl --location --request POST 'http://127.0.0.1:8000/words?word=coffee') >> mypath/results
+        echo curl --location --request GET 'http://127.0.0.1:8000/words' >> mypath/results
+        echo $(curl --location --request GET 'http://127.0.0.1:8000/words') >> mypath/results
+    - name: curl results
+      run: cat mypath/results
