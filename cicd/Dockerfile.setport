@@ -1,0 +1,10 @@
+FROM python:alpine3.17
+# This Dockerfile.setport is for use with rest-word-svr-v2.py
+WORKDIR ./app
+RUN pip install flask
+RUN pip install flask_restful
+COPY rest-word-svr-v2.py .
+EXPOSE 8000
+ENV FLASK_APP=rest-word-svr-v2.py
+ENV FLASK_RUN_PORT=8000
+CMD ["flask", "run", "--host=0.0.0.0"]
