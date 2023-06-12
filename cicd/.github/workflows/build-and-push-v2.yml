@@ -1,0 +1,27 @@
+name: build-and-push-v2
+on:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+          username: ${{ secrets.DOCKER_COURSE_USERNAME }}
+          password: ${{ secrets.DOCKER_COURSE_PASSWORD }}
+    - name: Set DATE
+      run: echo "DATE=$(date -I)" >> $GITHUB_ENV
+    - name: Build the Docker image
+      run: |
+        docker build . --file Dockerfile.setport --tag \
+        ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2
+        docker tag ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2 \
+        ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2:${{ env.DATE }}
+    - name: Push to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2
+        docker push \
+        ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2:${{ env.DATE }}
