@@ -1,0 +1,76 @@
+name: build-test-push-v4
+on:
+  push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Build and export
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Dockerfile.setport
+        tags: wordsvr-v2:latest, ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2:latest
+        outputs: type=docker,dest=/tmp/image.tar
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: wordsvr
+        path: /tmp/image.tar
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+#    1. download image and run it in a container
+    - name: Download artifact
+      uses: actions/download-artifact@v3  # downloads all artifacts
+    - name: Load Docker images from previous workflows
+      run: docker load --input wordsvr/image.tar
+    - name: check wordsvr image is loaded
+      run: docker image ls
+    - name: run image in container
+      run: docker run -p8000:8000 wordsvr-v2 &
+    - name: Check container is running
+      run: docker ps
+#     2. set up python and pytest environment
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest # not using yet lint checker like ruff
+        pip install requests
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+#      3. run pytest tests and check results
+    - name: Test with pytest  # additionally use ruff or other lint checkers
+      run: |
+        cd pytest-code
+        pytest -v test_word.py > test_results.txt
+    - name: upload test results
+      if: always()  # always perform this step even if tests fail, to see results
+      uses: actions/upload-artifact@v3
+      with:
+        name: GH_test_results
+        path: pytest-code/test_results.txt
+#     The following steps will only execute if tests succeeded
+    - name: Set DATE
+      run: echo "DATE=$(date -I)" >> $GITHUB_ENV
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_COURSE_USERNAME }}
+        password: ${{ secrets.DOCKER_COURSE_PASSWORD }}
+    - name: push image with "latest" and date tags to DH
+      run: |
+        docker push ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2
+        docker tag ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2 \
+        ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2:${{ env.DATE }}
+        docker push \
+        ${{ secrets.DOCKER_COURSE_USERNAME }}/wordsvr-v2:${{ env.DATE }}
